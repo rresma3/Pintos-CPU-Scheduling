@@ -10,4 +10,4 @@ Possible format:
 
 |Date|Time|Driver|Observers|Accomplishments|
 |---|---|---|---|---|
-|   |   |   |   |   |
+|09/26/18|4:00pm|Matthew Krueger|Jack Rentz, Ryan Resma|Understand Project|
