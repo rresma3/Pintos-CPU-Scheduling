@@ -24,11 +24,16 @@ static int64_t ticks;
    Initialized by timer_calibrate(). */
 static unsigned loops_per_tick;
 
+//static struct list blocked_list;
+
 static intr_handler_func timer_interrupt;
 static bool too_many_loops (unsigned loops);
 static void busy_wait (int64_t loops);
 static void real_time_sleep (int64_t num, int32_t denom);
 static void real_time_delay (int64_t num, int32_t denom);
+static bool list_sort_func(const struct list_elem *a, const struct list_elem *b, void *aux);
+
+
 
 /* Sets up the timer to interrupt TIMER_FREQ times per second,
    and registers the corresponding interrupt. */
@@ -92,8 +97,35 @@ timer_sleep (int64_t ticks)
   int64_t start = timer_ticks ();
 
   ASSERT (intr_get_level () == INTR_ON);
-  while (timer_elapsed (start) < ticks) 
-    thread_yield ();
+
+  struct thread *current_thread = thread_current ();
+
+  //ready_list
+
+  list_remove (&(current_thread->elem));
+  list_insert_ordered (&blocked_list, &(current_thread->elem), (list_less_func *) list_sort_func, NULL);
+
+
+  current_thread->status = THREAD_BLOCKED;
+  current_thread->alarm_ticks = timer_elapsed (start) + ticks;
+  
+  sema_down(current_thread->block);
+  // // timer_elapsed (start) + ticks = the time to wake up
+  // while (timer_elapsed (start) < ticks) 
+  //   thread_yield ();
+}
+
+/**/
+bool
+list_sort_func(const struct list_elem *a, const struct list_elem *b, void *aux)
+{
+  struct thread *temp_thread_1 = list_entry(a, struct thread, elem);
+  struct thread *temp_thread_2 = list_entry(b, struct thread, elem);
+
+  if (temp_thread_1->alarm_ticks >= temp_thread_2->alarm_ticks)
+    return false;
+  else
+    return true;
 }
 
 /* Sleeps for approximately MS milliseconds.  Interrupts must be
@@ -171,7 +203,21 @@ static void
 timer_interrupt (struct intr_frame *args UNUSED)
 {
   ticks++;
+  size_t size = list_size (&blocked_list);
+  struct thread *current_thread = list_entry (list_head(&blocked_list), struct thread, elem);
+  while ((current_thread->alarm_ticks) <= timer_ticks() && size != 0) 
+    {
+      list_remove (list_head(&blocked_list));
+      list_push_back (&ready_list, &(current_thread->elem));
+      sema_up (current_thread->block);
+      sema_down (current_thread->block);
+      size--;
+      current_thread = list_entry (list_head(&blocked_list), struct thread, elem);
+  	}
+
   thread_tick ();
+
+
 }
 
 /* Returns true if LOOPS iterations waits for more than one timer

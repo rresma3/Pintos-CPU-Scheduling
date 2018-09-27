@@ -22,11 +22,14 @@
 
 /* List of processes in THREAD_READY state, that is, processes
    that are ready to run but not actually running. */
-static struct list ready_list;
+//static struct list ready_list;
 
 /* List of all processes.  Processes are added to this list
    when they are first scheduled and removed when they exit. */
 static struct list all_list;
+
+/*List of threads that have called timer_sleep()*/
+//static struct list blocked_list;
 
 /* Idle thread. */
 static struct thread *idle_thread;
@@ -92,6 +95,8 @@ thread_init (void)
   lock_init (&tid_lock);
   list_init (&ready_list);
   list_init (&all_list);
+  list_init (&blocked_list);
+  sema_init (&(thread_current()->block), 0);
 
   /* Set up a thread structure for the running thread. */
   initial_thread = running_thread ();
