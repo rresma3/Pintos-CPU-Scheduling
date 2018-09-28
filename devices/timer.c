@@ -95,20 +95,20 @@ void
 timer_sleep (int64_t ticks) 
 {
   int64_t start = timer_ticks ();
-
   ASSERT (intr_get_level () == INTR_ON);
 
+  enum intr_level old_level = intr_disable ();
+
+  printf("Before 'thread_current()' call\n");
   struct thread *current_thread = thread_current ();
+  printf("After 'thread_current()' call\n");
 
-  //ready_list
-
-  list_remove (&(current_thread->elem));
+  // insert our current thread into the blocked list in sorted order
   list_insert_ordered (&blocked_list, &(current_thread->elem), (list_less_func *) list_sort_func, NULL);
-
-
-  current_thread->status = THREAD_BLOCKED;
+  // must move our current thread to the blocked list
   current_thread->alarm_ticks = timer_elapsed (start) + ticks;
-  
+  intr_set_level (old_level);
+
   sema_down(current_thread->block);
   // // timer_elapsed (start) + ticks = the time to wake up
   // while (timer_elapsed (start) < ticks) 
@@ -203,17 +203,23 @@ static void
 timer_interrupt (struct intr_frame *args UNUSED)
 {
   ticks++;
+
+  enum intr_level old_level = intr_disable ();
   size_t size = list_size (&blocked_list);
-  struct thread *current_thread = list_entry (list_head(&blocked_list), struct thread, elem);
-  while ((current_thread->alarm_ticks) <= timer_ticks() && size != 0) 
+  struct thread *current_thread = NULL;
+  // loop through list while there are blocked threads
+  while (size != 0) 
     {
-      list_remove (list_head(&blocked_list));
-      list_push_back (&ready_list, &(current_thread->elem));
+      current_thread = list_entry (list_head(&blocked_list), struct thread, elem);
+      // if the current thread is not ready to wake up, break
+      if ((current_thread->alarm_ticks) > timer_ticks())
+      	break;
+      list_pop_front(&blocked_list);
       sema_up (current_thread->block);
       sema_down (current_thread->block);
       size--;
-      current_thread = list_entry (list_head(&blocked_list), struct thread, elem);
   	}
+  intr_set_level (old_level);
 
   thread_tick ();
 

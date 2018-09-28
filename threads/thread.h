@@ -95,22 +95,19 @@ struct thread
     /* Shared between thread.c and synch.c. */
     struct list_elem elem;              /* List element. */
     struct semaphore *block;
+    // our declared time aspect for this given thread  
+    int64_t alarm_ticks;
 
 #ifdef USERPROG
     /* Owned by userprog/process.c. */
     uint32_t *pagedir;                  /* Page directory. */
 #endif
 
-    // our declared time aspect for this given thread  
-    int64_t alarm_ticks;
-
     /* Owned by thread.c. */
     unsigned magic;                     /* Detects stack overflow. */
   };
 
 static struct list blocked_list;
-
-static struct list ready_list;
 
 /* If false (default), use round-robin scheduler.
    If true, use multi-level feedback queue scheduler.

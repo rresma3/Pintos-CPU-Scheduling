@@ -22,7 +22,7 @@
 
 /* List of processes in THREAD_READY state, that is, processes
    that are ready to run but not actually running. */
-//static struct list ready_list;
+static struct list ready_list;
 
 /* List of all processes.  Processes are added to this list
    when they are first scheduled and removed when they exit. */
@@ -244,9 +244,24 @@ thread_unblock (struct thread *t)
 
   old_level = intr_disable ();
   ASSERT (t->status == THREAD_BLOCKED);
+
   list_push_back (&ready_list, &t->elem);
+  /*list_insert_ordered(&ready_list, &(current_thread()->elem), 
+      (list_less_func *)list_priority_sort, NULL);*/
   t->status = THREAD_READY;
   intr_set_level (old_level);
+}
+
+bool
+list_priority_sort(const struct list_elem *a, const struct list_elem *b, void *aux)
+{
+  struct thread *temp_thread_1 = list_entry(a, struct thread, elem);
+  struct thread *temp_thread_2 = list_entry(b, struct thread, elem);
+
+  if (temp_thread_1->priority <= temp_thread_2->priority)
+    return false;
+  else
+    return true;
 }
 
 /* Returns the name of the running thread. */
@@ -450,6 +465,10 @@ running_thread (void)
 static bool
 is_thread (struct thread *t)
 {
+  if (t == NULL)
+    printf("The thread is NULL\n");
+  else
+    printf("It wasn't NULL, the thread-magic number is %d, and it should be %d\n", t->magic, THREAD_MAGIC);
   return t != NULL && t->magic == THREAD_MAGIC;
 }
 
