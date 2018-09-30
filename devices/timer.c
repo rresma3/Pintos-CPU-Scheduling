@@ -98,7 +98,7 @@ timer_sleep (int64_t ticks)
   ASSERT (intr_get_level () == INTR_ON);
 
   enum intr_level old_level = intr_disable ();
-
+  /*
   struct thread *current_thread = thread_current ();
 
   // insert our current thread into the blocked list in sorted order
@@ -109,8 +109,9 @@ timer_sleep (int64_t ticks)
 
   sema_down(current_thread->block);
   // // timer_elapsed (start) + ticks = the time to wake up
-  // while (timer_elapsed (start) < ticks) 
-  //   thread_yield ();
+  */
+   while (timer_elapsed (start) < ticks) 
+     thread_yield ();
 }
 
 /**/
