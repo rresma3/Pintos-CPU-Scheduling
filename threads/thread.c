@@ -468,10 +468,10 @@ static bool
 is_thread (struct thread *t)
 {
   //printf("is_thread called\n");
-  if (t == NULL)
+  /*if (t == NULL)
     printf("The thread is NULL\n");
-  else
-    printf("It wasn't NULL, the thread-magic number is %d, and it should be %d\n", t->magic, THREAD_MAGIC);
+  else*/
+  printf("It wasn't NULL, the thread-magic number is %d, and it should be %d\n", t->magic, THREAD_MAGIC);
   return t != NULL && t->magic == THREAD_MAGIC;
 }
 
