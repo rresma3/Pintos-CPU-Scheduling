@@ -465,6 +465,7 @@ running_thread (void)
 static bool
 is_thread (struct thread *t)
 {
+  printf("is_thread called\n");
   if (t == NULL)
     printf("The thread is NULL\n");
   else

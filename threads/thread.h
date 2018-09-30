@@ -94,6 +94,7 @@ struct thread
 
     /* Shared between thread.c and synch.c. */
     struct list_elem elem;              /* List element. */
+  
     struct semaphore *block;
     // our declared time aspect for this given thread  
     int64_t alarm_ticks;
