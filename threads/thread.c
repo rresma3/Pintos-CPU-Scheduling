@@ -472,8 +472,10 @@ is_thread (struct thread *t)
     printf("The thread is NULL\n");
   else*/
   //printf("It wasn't NULL, the thread-magic number is %d, and it should be %d\n", t->magic, THREAD_MAGIC);
-  printf("");
+  
+  printf("%d\n", t->magic);
   return t != NULL && t->magic == THREAD_MAGIC;
+  
 }
 
 /* Does basic initialization of T as a blocked thread named
