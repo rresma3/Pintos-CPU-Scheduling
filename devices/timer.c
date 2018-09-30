@@ -96,7 +96,7 @@ timer_sleep (int64_t ticks)
 {
   int64_t start = timer_ticks ();
   ASSERT (intr_get_level () == INTR_ON);
-
+  /*
   enum intr_level old_level = intr_disable ();
   
   struct thread *current_thread = thread_current ();
@@ -109,9 +109,9 @@ timer_sleep (int64_t ticks)
 
   sema_down(current_thread->block);
   // // timer_elapsed (start) + ticks = the time to wake up
-  
-  /*while (timer_elapsed (start) < ticks) 
-    thread_yield ();*/
+  */
+  while (timer_elapsed (start) < ticks) 
+    thread_yield ();
 }
 
 /**/
@@ -202,7 +202,8 @@ static void
 timer_interrupt (struct intr_frame *args UNUSED)
 {
   ticks++;
-
+  printf("In the timer_interrupt handler\n");
+  /*
   enum intr_level old_level = intr_disable ();
   size_t size = list_size (&blocked_list);
   printf("Value of size is: %d\n", size);
@@ -221,7 +222,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
       size--;
   	}
   intr_set_level (old_level);
-
+  */
   thread_tick ();
 
 
