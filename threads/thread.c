@@ -239,7 +239,8 @@ void
 thread_unblock (struct thread *t) 
 {
   enum intr_level old_level;
-
+  
+  printf("Asserting is_thread in thread_unblock\n");
   ASSERT (is_thread (t));
 
   old_level = intr_disable ();
