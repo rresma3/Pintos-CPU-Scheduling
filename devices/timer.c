@@ -205,6 +205,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
 
   enum intr_level old_level = intr_disable ();
   size_t size = list_size (&blocked_list);
+  printf("Value of size is: %d\n", size);
   struct thread *current_thread = NULL;
   // loop through list while there are blocked threads
   while (size != 0) 
