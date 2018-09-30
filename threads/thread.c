@@ -469,10 +469,8 @@ is_thread (struct thread *t)
     printf("The thread is NULL\n");
   else*/
   //printf("It wasn't NULL, the thread-magic number is %d, and it should be %d\n", t->magic, THREAD_MAGIC);
-  bool isthread = t != NULL && t->magic == THREAD_MAGIC;
-  printf("This is stupid\n");
-  ASSERT(isthread);
-  return isthread;
+  //printf("This is stupid\n");
+  return t != NULL && t->magic == THREAD_MAGIC;
 }
 
 /* Does basic initialization of T as a blocked thread named
@@ -493,7 +491,7 @@ init_thread (struct thread *t, const char *name, int priority)
   t->priority = priority;
   t->magic = THREAD_MAGIC;
   
-  sema_init (t->block), 0);
+  sema_init (t->block, 0);
 
   old_level = intr_disable();
   list_push_back (&all_list, &t->allelem);
