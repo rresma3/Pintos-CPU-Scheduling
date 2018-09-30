@@ -242,15 +242,14 @@ thread_unblock (struct thread *t)
 {
   enum intr_level old_level;
   
-  //printf("Asserting is_thread in thread_unblock\n");
   ASSERT (is_thread (t));
 
   old_level = intr_disable ();
   ASSERT (t->status == THREAD_BLOCKED);
 
-  //list_push_back (&ready_list, &t->elem);
-  list_insert_ordered(&ready_list, &(thread_current()->elem), 
-      (list_less_func *)list_priority_sort, NULL);
+  list_push_back (&ready_list, &t->elem);
+  /*list_insert_ordered(&ready_list, &(thread_current()->elem), 
+      (list_less_func *)list_priority_sort, NULL);*/
   t->status = THREAD_READY;
   intr_set_level (old_level);
 }
@@ -287,7 +286,6 @@ thread_current (void)
      have overflowed its stack.  Each thread has less than 4 kB
      of stack, so a few big automatic arrays or moderate
      recursion can cause stack overflow. */
-  printf("Asserting is_thread in thread_current\n");
   ASSERT (is_thread (t));
   ASSERT (t->status == THREAD_RUNNING);
 
@@ -469,11 +467,11 @@ running_thread (void)
 static bool
 is_thread (struct thread *t)
 {
-  printf("is_thread called\n");
+  /*printf("is_thread called\n");
   if (t == NULL)
     printf("The thread is NULL\n");
   else
-    printf("It wasn't NULL, the thread-magic number is %d, and it should be %d\n", t->magic, THREAD_MAGIC);
+    printf("It wasn't NULL, the thread-magic number is %d, and it should be %d\n", t->magic, THREAD_MAGIC);*/
   return t != NULL && t->magic == THREAD_MAGIC;
 }
 

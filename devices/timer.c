@@ -99,9 +99,7 @@ timer_sleep (int64_t ticks)
 
   enum intr_level old_level = intr_disable ();
 
-  printf("Before 'thread_current()' call\n");
   struct thread *current_thread = thread_current ();
-  printf("After 'thread_current()' call\n");
 
   // insert our current thread into the blocked list in sorted order
   list_insert_ordered (&blocked_list, &(current_thread->elem), (list_less_func *) list_sort_func, NULL);
