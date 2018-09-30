@@ -474,7 +474,7 @@ is_thread (struct thread *t)
   //printf("It wasn't NULL, the thread-magic number is %d, and it should be %d\n", t->magic, THREAD_MAGIC);
   
   //printf("%d\n", t->magic);
-  printf("\n");
+  printf(" ");
   return t != NULL && t->magic == THREAD_MAGIC;
   
 }
