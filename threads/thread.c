@@ -246,7 +246,7 @@ thread_unblock (struct thread *t)
   ASSERT (t->status == THREAD_BLOCKED);
 
   //list_push_back (&ready_list, &t->elem);
-  list_insert_ordered(&ready_list, &(current_thread()->elem), 
+  list_insert_ordered(&ready_list, &(thread_current()->elem), 
       (list_less_func *)list_priority_sort, NULL);
   t->status = THREAD_READY;
   intr_set_level (old_level);
