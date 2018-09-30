@@ -240,7 +240,7 @@ thread_unblock (struct thread *t)
 {
   enum intr_level old_level;
   
-  printf("Asserting is_thread in thread_unblock\n");
+  //printf("Asserting is_thread in thread_unblock\n");
   ASSERT (is_thread (t));
 
   old_level = intr_disable ();
@@ -285,6 +285,7 @@ thread_current (void)
      have overflowed its stack.  Each thread has less than 4 kB
      of stack, so a few big automatic arrays or moderate
      recursion can cause stack overflow. */
+  printf("Asserting is_thread in thread_current\n");
   ASSERT (is_thread (t));
   ASSERT (t->status == THREAD_RUNNING);
 
