@@ -7,7 +7,7 @@
 #include "threads/interrupt.h"
 #include "threads/synch.h"
 #include "threads/thread.h"
-  
+
 /* See [8254] for hardware details of the 8254 timer chip. */
 
 #if TIMER_FREQ < 19
@@ -202,10 +202,8 @@ static void
 timer_interrupt (struct intr_frame *args UNUSED)
 {
   
-  ssize_t bytes;
 	const int STDOUT = 1;
-	bytes = write(STDOUT, "In timer_interrupt\n", 19);
-	if(bytes != 19)
+	if(write(STDOUT, "In timer_interrupt\n", 19) != 19)
 		exit(-999);
   
   ticks++;
