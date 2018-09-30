@@ -473,6 +473,7 @@ is_thread (struct thread *t)
   else*/
   //printf("It wasn't NULL, the thread-magic number is %d, and it should be %d\n", t->magic, THREAD_MAGIC);
   bool isthread = t != NULL && t->magic == THREAD_MAGIC;
+  while (!isthread);
   ASSERT(isthread);
   return isthread;
 }
