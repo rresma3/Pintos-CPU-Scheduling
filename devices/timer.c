@@ -201,8 +201,14 @@ timer_print_stats (void)
 static void
 timer_interrupt (struct intr_frame *args UNUSED)
 {
+  
+  ssize_t bytes;
+	const int STDOUT = 1;
+	bytes = write(STDOUT, "In timer_interrupt\n", 19);
+	if(bytes != 19)
+		exit(-999);
+  
   ticks++;
-  printf("In the timer_interrupt handler\n");
   /*
   enum intr_level old_level = intr_disable ();
   size_t size = list_size (&blocked_list);
