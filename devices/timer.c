@@ -202,10 +202,6 @@ static void
 timer_interrupt (struct intr_frame *args UNUSED)
 {
   
-	const int STDOUT = 1;
-	if(write(STDOUT, "In timer_interrupt\n", 19) != 19)
-		exit(-999);
-  
   ticks++;
   /*
   enum intr_level old_level = intr_disable ();
@@ -228,8 +224,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
   intr_set_level (old_level);
   */
   thread_tick ();
-
-
+  
 }
 
 /* Returns true if LOOPS iterations waits for more than one timer
