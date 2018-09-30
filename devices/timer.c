@@ -209,6 +209,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
   // loop through list while there are blocked threads
   while (size != 0) 
     {
+      printf("Value of size is: %d\n", size);
       current_thread = list_entry (list_head(&blocked_list), struct thread, elem);
       // if the current thread is not ready to wake up, break
       if ((current_thread->alarm_ticks) > timer_ticks())
