@@ -26,8 +26,6 @@ static unsigned loops_per_tick;
 
 static struct list blocked_list;
 
-//static struct list blocked_list;
-
 static intr_handler_func timer_interrupt;
 static bool too_many_loops (unsigned loops);
 static void busy_wait (int64_t loops);
@@ -109,6 +107,7 @@ timer_sleep (int64_t ticks)
   list_insert_ordered (&blocked_list, &(current_thread->elem), (list_less_func *) list_sort_func, NULL);
   // must move our current thread to the blocked list
   current_thread->alarm_ticks = timer_elapsed (start) + ticks;
+  
   intr_set_level (old_level);
 
   sema_down(current_thread->block);
@@ -210,12 +209,12 @@ timer_interrupt (struct intr_frame *args UNUSED)
   //*
   enum intr_level old_level = intr_disable ();
   size_t size = list_size (&blocked_list);
-  printf("Value of size is: %d\n", size);
+  //printf("Value of size is: %d\n", size);
   struct thread *current_thread = NULL;
   // loop through list while there are blocked threads
   while (size != 0) 
     {
-      printf("Value of size is: %d\n", size);
+      //printf("Value of size is: %d\n", size);
       current_thread = list_entry (list_head(&blocked_list), struct thread, elem);
       // if the current thread is not ready to wake up, break
       if ((current_thread->alarm_ticks) > timer_ticks())
