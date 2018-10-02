@@ -24,6 +24,8 @@ static int64_t ticks;
    Initialized by timer_calibrate(). */
 static unsigned loops_per_tick;
 
+static struct list blocked_list;
+
 //static struct list blocked_list;
 
 static intr_handler_func timer_interrupt;
@@ -42,6 +44,8 @@ timer_init (void)
 {
   pit_configure_channel (0, 2, TIMER_FREQ);
   intr_register_ext (0x20, timer_interrupt, "8254 Timer");
+  
+  list_init (&blocked_list);
 }
 
 /* Calibrates loops_per_tick, used to implement brief delays. */
