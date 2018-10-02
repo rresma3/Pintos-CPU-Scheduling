@@ -94,9 +94,8 @@ timer_elapsed (int64_t then)
 /* Sleeps for approximately TICKS timer ticks.  Interrupts must
    be turned on. */
 void
-timer_sleep (int64_t ticks) 
+timer_sleep (int64_t duration) 
 {
-  int64_t start = timer_ticks ();
   ASSERT (intr_get_level () == INTR_ON);
   
   enum intr_level old_level = intr_disable ();
@@ -106,7 +105,7 @@ timer_sleep (int64_t ticks)
   // insert our current thread into the blocked list in sorted order
   list_insert_ordered (&blocked_list, &(current_thread->blocked_elem), (list_less_func *) list_sort_func, NULL);
   // must move our current thread to the blocked list
-  current_thread->alarm_ticks = timer_elapsed (start) + ticks;
+  current_thread->alarm_ticks = ticks + duration;
   
   //printf("Called timer_sleep with an alarm_ticks of %d\n", current_thread->alarm_ticks);
   
@@ -219,7 +218,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
       //printf("Value of size is: %d\n", size);
       current_thread = list_entry (list_begin(&blocked_list), struct thread, blocked_elem);
       // if the current thread is not ready to wake up, break
-      if ((current_thread->alarm_ticks) <= timer_ticks())
+      if ((current_thread->alarm_ticks) <= ticks)
         {
       	  list_pop_front(&blocked_list);
           sema_up (&(current_thread->block));
