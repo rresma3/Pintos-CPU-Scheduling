@@ -215,13 +215,14 @@ timer_interrupt (struct intr_frame *args UNUSED)
   while (!list_empty (&blocked_list)) 
     {
       //printf("Value of size is: %d\n", size);
-      current_thread = list_entry (list_head(&blocked_list), struct thread, elem);
+      current_thread = list_entry (list_begin(&blocked_list), struct thread, elem);
       // if the current thread is not ready to wake up, break
       if ((current_thread->alarm_ticks) > timer_ticks())
       	break;
       //list_pop_front(&blocked_list);
       sema_up (&(current_thread->block));
       sema_down (&(current_thread->block));
+      
       list_pop_front(&blocked_list);
       //size--;
   	}
