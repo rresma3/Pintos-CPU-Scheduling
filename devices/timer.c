@@ -110,7 +110,7 @@ timer_sleep (int64_t ticks)
   printf("Called timer_sleep with an alarm_ticks of %d\n", current_thread->alarm_ticks);
   intr_set_level (old_level);
 
-  sema_down(current_thread->block);
+  sema_down(&(current_thread->block));
   // // timer_elapsed (start) + ticks = the time to wake up
   /*
   while (timer_elapsed (start) < ticks) 
@@ -220,8 +220,8 @@ timer_interrupt (struct intr_frame *args UNUSED)
       if ((current_thread->alarm_ticks) > timer_ticks())
       	break;
       list_pop_front(&blocked_list);
-      sema_up (current_thread->block);
-      sema_down (current_thread->block);
+      sema_up (&(current_thread->block));
+      sema_down (&(current_thread->block));
       size--;
   	}
   intr_set_level (old_level);
