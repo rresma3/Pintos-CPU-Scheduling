@@ -107,7 +107,7 @@ timer_sleep (int64_t ticks)
   list_insert_ordered (&blocked_list, &(current_thread->elem), (list_less_func *) list_sort_func, NULL);
   // must move our current thread to the blocked list
   current_thread->alarm_ticks = timer_elapsed (start) + ticks;
-  printf("Called timer_sleep with an alarm_ticks of %d\n", current_thread -> alarm_ticks);
+  printf("Called timer_sleep with an alarm_ticks of %d\n", current_thread->alarm_ticks);
   intr_set_level (old_level);
 
   sema_down(current_thread->block);
