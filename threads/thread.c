@@ -242,14 +242,14 @@ thread_unblock (struct thread *t)
 
   old_level = intr_disable ();
   
-  
+  /*
   if (t->status == THREAD_BLOCKED)
     printf("Thread status is THREAD_BLOCKED\n");
   else if (t->status == THREAD_READY)
     printf("Thread status is THREAD_READY\n");
   else if (t->status == THREAD_RUNNING)
     printf("Thread status is THREAD_RUNNING\n");
-    
+  */
   
   ASSERT (t->status == THREAD_BLOCKED);
 
