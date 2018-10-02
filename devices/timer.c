@@ -24,7 +24,7 @@ static int64_t ticks;
    Initialized by timer_calibrate(). */
 static unsigned loops_per_tick;
 
-static struct list blocked_list;
+static struct list *blocked_list;
 
 static intr_handler_func timer_interrupt;
 static bool too_many_loops (unsigned loops);
@@ -43,7 +43,7 @@ timer_init (void)
   pit_configure_channel (0, 2, TIMER_FREQ);
   intr_register_ext (0x20, timer_interrupt, "8254 Timer");
   
-  list_init (&blocked_list);
+  list_init (blocked_list);
 }
 
 /* Calibrates loops_per_tick, used to implement brief delays. */
@@ -104,10 +104,10 @@ timer_sleep (int64_t ticks)
   struct thread *current_thread = thread_current ();
 
   // insert our current thread into the blocked list in sorted order
-  list_insert_ordered (&blocked_list, &(current_thread->elem), (list_less_func *) list_sort_func, NULL);
+  list_insert_ordered (blocked_list, &(current_thread->elem), (list_less_func *) list_sort_func, NULL);
   // must move our current thread to the blocked list
   current_thread->alarm_ticks = timer_elapsed (start) + ticks;
-  
+  printf("Called timer_sleep with an alarm_ticks of %d\n", current_thread -> alarm_ticks);
   intr_set_level (old_level);
 
   sema_down(current_thread->block);
@@ -208,18 +208,18 @@ timer_interrupt (struct intr_frame *args UNUSED)
   ticks++;
   //*
   enum intr_level old_level = intr_disable ();
-  size_t size = list_size (&blocked_list);
+  size_t size = list_size (blocked_list);
   //printf("Value of size is: %d\n", size);
   struct thread *current_thread = NULL;
   // loop through list while there are blocked threads
   while (size != 0) 
     {
       //printf("Value of size is: %d\n", size);
-      current_thread = list_entry (list_head(&blocked_list), struct thread, elem);
+      current_thread = list_entry (list_head(blocked_list), struct thread, elem);
       // if the current thread is not ready to wake up, break
       if ((current_thread->alarm_ticks) > timer_ticks())
       	break;
-      list_pop_front(&blocked_list);
+      list_pop_front(blocked_list);
       sema_up (current_thread->block);
       sema_down (current_thread->block);
       size--;
