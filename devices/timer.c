@@ -219,7 +219,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
       printf("Looping through blocked_list\n");
       current_thread = list_entry (list_begin(&blocked_list), struct thread, blocked_elem);
       // if the current thread is not ready to wake up, break
-      if (((current_thread->alarm_ticks) > ticks)
+      if ((current_thread->alarm_ticks) > ticks)
         {
       	  break;
         }
