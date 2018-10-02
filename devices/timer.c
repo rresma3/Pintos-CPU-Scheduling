@@ -208,13 +208,13 @@ timer_interrupt (struct intr_frame *args UNUSED)
   ticks++;
   //*
   enum intr_level old_level = intr_disable ();
-  size_t size = list_size (&blocked_list);
+  //size_t size = list_size (&blocked_list);
   //printf("Value of size is: %d\n", size);
   struct thread *current_thread = NULL;
   // loop through list while there are blocked threads
-  while (size != 0) 
+  while (!list_empty (&blocked_list)) 
     {
-      //printf("Value of size is: %d\n", size);
+      printf("Value of size is: %d\n", size);
       current_thread = list_entry (list_head(&blocked_list), struct thread, elem);
       // if the current thread is not ready to wake up, break
       if ((current_thread->alarm_ticks) > timer_ticks())
@@ -222,7 +222,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
       list_pop_front(&blocked_list);
       sema_up (&(current_thread->block));
       sema_down (&(current_thread->block));
-      size--;
+      //size--;
   	}
   intr_set_level (old_level);
   //*/
