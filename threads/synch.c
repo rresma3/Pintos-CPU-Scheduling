@@ -68,6 +68,8 @@ sema_down (struct semaphore *sema)
   old_level = intr_disable ();
   while (sema->value == 0) 
     {
+      printf("The status of the thread being added to the waiter's list in the semaphore = %d, THREAD_BLOCKED = %d\n", 
+                               &thread_current ()->status,THREAD_BLOCKED);
       list_push_back (&sema->waiters, &thread_current ()->elem);
       thread_block ();
     }
@@ -116,7 +118,7 @@ sema_up (struct semaphore *sema)
   
   if (!list_empty (&sema->waiters)) 
     {
-        printf("The status of the thread at the beginning of the waiter's list in the semaphore %d, THREAD_BLOCKED = %d\n", 
+        printf("The status of the thread at the beginning of the waiter's list in the semaphore = %d, THREAD_BLOCKED = %d\n", 
                                 list_entry (list_begin(&sema->waiters), struct thread, elem)->status,THREAD_BLOCKED);
         thread_unblock (list_entry (list_pop_front (&sema->waiters),
                                 struct thread, elem));
