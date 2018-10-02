@@ -110,7 +110,8 @@ timer_sleep (int64_t duration)
   //printf("Called timer_sleep with an alarm_ticks of %d\n", current_thread->alarm_ticks);
   
   intr_set_level (old_level);
-
+  
+  while (sema_try_down (&(current_thread->block)));
   sema_down(&(current_thread->block));
   // // timer_elapsed (start) + ticks = the time to wake up
   /*
@@ -126,9 +127,9 @@ list_sort_func(const struct list_elem *a, const struct list_elem *b, void *aux)
   struct thread *temp_thread_2 = list_entry(b, struct thread, blocked_elem);
 
   if (temp_thread_1->alarm_ticks >= temp_thread_2->alarm_ticks)
-    return false;
-  else
     return true;
+  else
+    return false;
 }
 
 /* Sleeps for approximately MS milliseconds.  Interrupts must be
