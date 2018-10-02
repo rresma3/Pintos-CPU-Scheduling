@@ -69,7 +69,7 @@ sema_down (struct semaphore *sema)
   while (sema->value == 0) 
     {
       printf("The status of the thread being added to the waiter's list in the semaphore = %d, THREAD_BLOCKED = %d\n", 
-                               &thread_current ()->status,THREAD_BLOCKED);
+                               thread_current ()->status,THREAD_BLOCKED);
       list_push_back (&sema->waiters, &thread_current ()->elem);
       thread_block ();
     }
