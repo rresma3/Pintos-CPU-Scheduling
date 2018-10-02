@@ -220,9 +220,11 @@ timer_interrupt (struct intr_frame *args UNUSED)
       current_thread = list_entry (list_begin(&blocked_list), struct thread, elem);
       // if the current thread is not ready to wake up, break
       if ((current_thread->alarm_ticks) <= timer_ticks())
-      	list_pop_front(&blocked_list);
-        sema_up (&(current_thread->block));
-        sema_try_down (&(current_thread->block));
+        {
+      	  list_pop_front(&blocked_list);
+          sema_up (&(current_thread->block));
+          sema_try_down (&(current_thread->block));
+        }
       else
         break;
       
