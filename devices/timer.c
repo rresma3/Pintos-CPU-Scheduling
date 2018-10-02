@@ -207,6 +207,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
 {
   
   ticks++;
+  thread_tick ();
   //*
   enum intr_level old_level = intr_disable ();
   //size_t size = list_size (&blocked_list);
@@ -218,20 +219,22 @@ timer_interrupt (struct intr_frame *args UNUSED)
       printf("Looping through blocked_list\n");
       current_thread = list_entry (list_begin(&blocked_list), struct thread, blocked_elem);
       // if the current thread is not ready to wake up, break
-      if ((current_thread->alarm_ticks) <= ticks)
+      if (((current_thread->alarm_ticks) > ticks)
         {
-      	  list_pop_front(&blocked_list);
+      	  break;
+        }
+      else
+        {
+          list_pop_front(&blocked_list);
           sema_up (&(current_thread->block));
           sema_try_down (&(current_thread->block));
         }
-      else
-        break;
       
       //size--;
   	}
   intr_set_level (old_level);
   //*/
-  thread_tick ();
+  
   
 }
 
