@@ -119,17 +119,16 @@ timer_sleep (int64_t duration)
     thread_yield ();*/
 }
 
-/**/
+/*CHECK THIS!!!!!*/
 bool
 list_sort_func(const struct list_elem *a, const struct list_elem *b, void *aux)
 {
   struct thread *temp_thread_1 = list_entry(a, struct thread, blocked_elem);
   struct thread *temp_thread_2 = list_entry(b, struct thread, blocked_elem);
 
-  if (temp_thread_1->alarm_ticks >= temp_thread_2->alarm_ticks)
-    return true;
-  else
+  if (temp_thread_1->alarm_ticks < temp_thread_2->alarm_ticks)
     return false;
+  return true;
 }
 
 /* Sleeps for approximately MS milliseconds.  Interrupts must be
