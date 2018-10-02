@@ -95,6 +95,7 @@ struct thread
 
     /* Shared between thread.c and synch.c. */
     struct list_elem elem;              /* List element. */
+    struct list_elem blocked_elem;
   
     struct semaphore block;
     // our declared time aspect for this given thread  

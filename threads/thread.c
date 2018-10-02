@@ -268,8 +268,7 @@ list_priority_sort(const struct list_elem *a, const struct list_elem *b, void *a
 
   if (temp_thread_1->priority <= temp_thread_2->priority)
     return false;
-  else
-    return true;
+  return true;
 }
 
 /* Returns the name of the running thread. */

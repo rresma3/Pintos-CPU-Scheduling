@@ -104,7 +104,7 @@ timer_sleep (int64_t ticks)
   struct thread *current_thread = thread_current ();
 
   // insert our current thread into the blocked list in sorted order
-  list_insert_ordered (&blocked_list, &(current_thread->elem), (list_less_func *) list_sort_func, NULL);
+  list_insert_ordered (&blocked_list, &(current_thread->blocked_elem), (list_less_func *) list_sort_func, NULL);
   // must move our current thread to the blocked list
   current_thread->alarm_ticks = timer_elapsed (start) + ticks;
   
@@ -123,8 +123,8 @@ timer_sleep (int64_t ticks)
 bool
 list_sort_func(const struct list_elem *a, const struct list_elem *b, void *aux)
 {
-  struct thread *temp_thread_1 = list_entry(a, struct thread, elem);
-  struct thread *temp_thread_2 = list_entry(b, struct thread, elem);
+  struct thread *temp_thread_1 = list_entry(a, struct thread, blocked_elem);
+  struct thread *temp_thread_2 = list_entry(b, struct thread, blocked_elem);
 
   if (temp_thread_1->alarm_ticks >= temp_thread_2->alarm_ticks)
     return false;
@@ -217,7 +217,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
   while (!list_empty (&blocked_list)) 
     {
       //printf("Value of size is: %d\n", size);
-      current_thread = list_entry (list_begin(&blocked_list), struct thread, elem);
+      current_thread = list_entry (list_begin(&blocked_list), struct thread, blocked_elem);
       // if the current thread is not ready to wake up, break
       if ((current_thread->alarm_ticks) <= timer_ticks())
         {
