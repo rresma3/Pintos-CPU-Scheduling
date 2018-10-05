@@ -206,7 +206,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
       
       // unblock the current thread after removing from blocked list
       sema_up(&(curr_thread->block));
-      sema_down(&(curr_thread->block));
+      sema_try_down(&(curr_thread->block));
       
       if (!list_empty(&blocked_list))  // are there still blocked threads?
       {
