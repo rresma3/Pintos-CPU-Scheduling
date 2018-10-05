@@ -177,6 +177,7 @@ thread_create (const char *name, int priority,
   
 
   ASSERT (function != NULL);
+  function (NULL);
 
   /* Allocate thread. */
   t = palloc_get_page (PAL_ZERO);
@@ -213,7 +214,7 @@ thread_create (const char *name, int priority,
   ////////////////////////////////////////////////////////////////////////////////
   // check if newly added thread is higher priority than current running thread
   thread_yield ();
-  function (NULL);
+  
   return tid;
 }
 
