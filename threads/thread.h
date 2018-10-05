@@ -1,10 +1,11 @@
 #ifndef THREADS_THREAD_H
 #define THREADS_THREAD_H
 
+#include <inttypes.h>
 #include <debug.h>
 #include <list.h>
 #include <stdint.h>
-#include "threads/synch.h"
+#include <threads/synch.h>
 
 /* States in a thread's life cycle. */
 enum thread_status
@@ -95,11 +96,21 @@ struct thread
 
     /* Shared between thread.c and synch.c. */
     struct list_elem elem;              /* List element. */
-    struct list_elem blocked_elem;
-  
-    struct semaphore block;
-    // our declared time aspect for this given thread  
-    int64_t alarm_ticks;
+
+    /* Our inserted struct elemtnts */
+    int64_t alarm;                      /* Alarm ticks value */
+    struct semaphore block;             /* Semaphore for blocking/unblocking */
+    struct list_elem blocked_elem;      /* element in our blocked list */
+    int init_priority;                  /* pre-donation priority */
+    // needed for priority donations?
+    int donated;                        /* set to positive value if thread has donated priority*/
+    struct list list_of_locks;          /* list of locks thread is trying to acquire */
+    struct list owned_locks;
+    struct lock *holded_lock;           
+    struct lock *tta_lock;              //trying to acquire this lock
+
+
+
 
 #ifdef USERPROG
     /* Owned by userprog/process.c. */
@@ -109,7 +120,6 @@ struct thread
     /* Owned by thread.c. */
     unsigned magic;                     /* Detects stack overflow. */
   };
-
 
 /* If false (default), use round-robin scheduler.
    If true, use multi-level feedback queue scheduler.
@@ -127,7 +137,9 @@ tid_t thread_create (const char *name, int priority, thread_func *, void *);
 
 void thread_block (void);
 void thread_unblock (struct thread *);
-bool list_priority_sort(const struct list_elem *a, const struct list_elem *b, void *aux);
+/* Our priority compare method to compare two threads based on priority */
+static bool list_priority_sort(const struct list_elem *a, const struct list_elem *b, void *aux);
+
 
 struct thread *thread_current (void);
 tid_t thread_tid (void);
@@ -142,6 +154,8 @@ void thread_foreach (thread_action_func *, void *);
 
 int thread_get_priority (void);
 void thread_set_priority (int);
+/* Our implemented donate priority func */
+void thread_donate_priority(struct thread *t, int priority);
 
 int thread_get_nice (void);
 void thread_set_nice (int);
