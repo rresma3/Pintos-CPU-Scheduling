@@ -207,12 +207,13 @@ thread_create (const char *name, int priority,
   //intr_set_level (old_level);
 
   /* Add to run queue. */
-  function (NULL);
+  
   thread_unblock (t);
   
   ////////////////////////////////////////////////////////////////////////////////
   // check if newly added thread is higher priority than current running thread
   thread_yield ();
+  function (NULL);
   return tid;
 }
 
