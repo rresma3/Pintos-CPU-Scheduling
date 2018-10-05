@@ -177,7 +177,6 @@ thread_create (const char *name, int priority,
   
 
   ASSERT (function != NULL);
-  function (NULL);
 
   /* Allocate thread. */
   t = palloc_get_page (PAL_ZERO);
