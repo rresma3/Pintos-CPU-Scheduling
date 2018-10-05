@@ -108,10 +108,10 @@ timer_sleep (int64_t duration)
     curr_thread->alarm = timer_ticks () + duration;  
     // insert the alarm into the blocked list in alarm-sorted order
     list_insert_ordered (&blocked_list, &(curr_thread->blocked_elem), list_sort_func, NULL);
-    // block the current thread using its built in semaphore
-    sema_down (&(curr_thread->block));  
     // enable interrupts once thread has been blocked
     intr_set_level (old_level);
+    // block the current thread using its built in semaphore
+    sema_down (&(curr_thread->block));
   }
 }
 
@@ -203,8 +203,11 @@ timer_interrupt (struct intr_frame *args UNUSED)
     {
       // because the blocked list is alarm-sorted, simply remove the front
       list_pop_front (&blocked_list);
+      
       // unblock the current thread after removing from blocked list
       sema_up(&(curr_thread->block));
+      sema_down(&(curr_thread->block));
+      
       if (!list_empty(&blocked_list))  // are there still blocked threads?
       {
         // if so, check the next thread in line
