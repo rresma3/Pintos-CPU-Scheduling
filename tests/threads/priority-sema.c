@@ -40,7 +40,6 @@ test_priority_sema (void)
 static void
 priority_sema_thread (void *aux UNUSED) 
 {
-  msg("We called the function.");
   sema_down (&sema);
   msg ("Thread %s woke up.", thread_name ());
 }
