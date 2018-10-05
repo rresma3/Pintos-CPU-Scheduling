@@ -208,7 +208,7 @@ thread_create (const char *name, int priority,
 
   /* Add to run queue. */
   thread_unblock (t);
-  function (NULL);
+  //function (NULL);
 
   ////////////////////////////////////////////////////////////////////////////////
   // check if newly added thread is higher priority than current running thread
