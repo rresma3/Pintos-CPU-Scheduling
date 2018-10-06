@@ -217,7 +217,7 @@ lock_acquire (struct lock *lock)
   {
     if (lock->holder->priority < thread_current()->priority)
     {
-        printf("Got in here 1\n");
+        //printf("Got in here 1\n");
         //donate priority
         lock->holder->donated = 1;
         thread_donate_priority (lock->holder, thread_current()->priority);
@@ -261,7 +261,7 @@ lock_release (struct lock *lock)
   
   if (lock->holder->donated)
   {
-      printf("Got in here 2\n");
+      //printf("Got in here 2\n");
       lock->holder->priority = lock->holder->initial_priority;
       lock->holder->donated = 0;
   }
