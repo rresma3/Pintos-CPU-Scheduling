@@ -325,6 +325,7 @@ void
 cond_wait (struct condition *cond, struct lock *lock) 
 {
   struct semaphore_elem waiter;
+  waiter.elem = thread_current ()->elem;
 
   ASSERT (cond != NULL);
   ASSERT (lock != NULL);
