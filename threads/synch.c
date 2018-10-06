@@ -325,8 +325,7 @@ void
 cond_wait (struct condition *cond, struct lock *lock) 
 {
   struct semaphore_elem waiter;
-  waiter.elem = thread_current ()->elem;
-  printf("The thread's priority is %d\n", list_entry(&waiter.elem, struct thread, elem)->priority);
+  printf("The thread's priority is %d\n", list_entry(&waiter.elem, struct semaphore_elem, elem)->priority);
 
   ASSERT (cond != NULL);
   ASSERT (lock != NULL);
