@@ -268,6 +268,8 @@ lock_release (struct lock *lock)
       lock->holder->donated = 0;
   }*/
   
+  //god i hope this works
+  
   if (lock->holder->donated > 0)
   {
       if (!list_empty (&(thread_current ()->priority_donors)))
