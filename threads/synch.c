@@ -218,7 +218,7 @@ lock_acquire (struct lock *lock)
     if (lock->holder->priority < thread_current()->priority)
     {
         //donate priority
-        lock->holder->donated = 1;
+        lock->holder->donated++;
         thread_donate_priority (lock->holder, thread_current()->priority);
     }
   }
@@ -263,16 +263,19 @@ lock_release (struct lock *lock)
   /*if (!list_empty (&(thread_current ()->priority_donors)))
   {
       //lock->holder->priority = lock->holder->initial_priority;
-      lock->holder->priority = list_entry (list_pop_front (&(thread_current ()->priority_donors)), struct thread, elem)->priority;
+      lock->holder->priority = list_entry (list_pop_front (&(thread_current ()->priority_donors)), struct thread, donor_elem)->priority;
       
       lock->holder->donated = 0;
   }*/
   
-  if (lock->holder->donated)
+  if (lock->holder->donated > 0)
   {
-      lock->holder->priority = lock->holder->initial_priority;
+      if (!list_empty (&(thread_current ()->priority_donors)))
+        lock->holder->priority = list_entry (list_pop_front (&(thread_current ()->priority_donors)), struct thread, donor_elem)->priority;
+      else
+        lock->holder->priority = lock->holder->initial_priority;
       
-      lock->holder->donated = 0;
+      lock->holder->donated--;
   }
   
   lock->holder = NULL;

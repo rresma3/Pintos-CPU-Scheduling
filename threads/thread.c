@@ -404,7 +404,7 @@ thread_donate_priority(struct thread *t, int new_priority)
 {
    // donation : change only current priority
   t->priority = new_priority;
-  //list_push_front(&(thread_current ()->priority_donors), &(t->elem));
+  list_push_front(&(thread_current ()->priority_donors), &(t->donor_elem));
   
   // if current thread gets its priority decreased, then yield
   // (foremost entry in ready_list shall have the highest priority)
@@ -541,8 +541,7 @@ init_thread (struct thread *t, const char *name, int priority)
   sema_init (&(t->block), 0);
   
   t->initial_priority = priority;
-  list_init(&t->list_of_locks); /* list of locks thread is trying to acquire */
-  //list_init(&t->owned_locks);
+  list_init(&t->list_of_locks);       /* list of locks thread is trying to acquire */
   list_init(&t->priority_donors);
   t->donated = 0;
   t->magic = THREAD_MAGIC;
