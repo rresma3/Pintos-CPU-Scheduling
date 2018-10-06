@@ -259,7 +259,16 @@ thread_unblock (struct thread *t)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+static bool
+list_priority_sort(const struct list_elem *a, const struct list_elem *b, void *aux)
+{
+  struct thread *temp_thread_1 = list_entry(a, struct thread, elem);
+  struct thread *temp_thread_2 = list_entry(b, struct thread, elem);
 
+  if (temp_thread_1->priority <= temp_thread_2->priority)
+    return false;
+  return true;
+}
 
 /* Returns the name of the running thread. */
 const char *
