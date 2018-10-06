@@ -212,30 +212,13 @@ lock_acquire (struct lock *lock)
   int current_thread_priority = thread_current()->priority;
 
 
-  // struct lock *current_lock = lock; 
+ 
 
-  // if (lock->holder != NULL) 
-  // {
-  //   if (current->priority > lock->holder->priority)
-  //     lock->holder->priority = current->priority;
-
-  //   current->waiting_lock = lock;
-  //   struct thread *next = lock->holder;
-  //   /* Prithvi driving*/
-  //   while (next->waiting_lock != NULL) 
-  //   {
-  //     struct thread *holder = next->waiting_lock->holder;
-  //     if (next->priority > holder->priority) 
-  //     {
-  //       /* in this loop we swap priorities that is chained to the lock */
-  //       holder->priority = next->priority;
-  //       next = holder;
-  //     }
-  //   }
-
-  if ()
+  if (lock->holder->priority < thread_current()->priority)
   {
-      
+      //donate priority
+      lock->holder->donated = 1;
+      thread_donate_priority (lock->holder, thread_current()->priority);
   }
   
   sema_down (&lock->semaphore);
@@ -272,7 +255,13 @@ lock_release (struct lock *lock)
 {
   ASSERT (lock != NULL);
   ASSERT (lock_held_by_current_thread (lock));
-
+  
+  if (lock->holder->donated)
+  {
+      lock->holder->priority = lock->holder->initial_priority;
+      lock->holder->donated = 0;
+  }
+  
   lock->holder = NULL;
   sema_up (&lock->semaphore);
 }
@@ -406,3 +395,24 @@ list_priority_sort_monitor(const struct list_elem *a, const struct list_elem *b,
     return false;
   return true;
 }
+
+ // struct lock *current_lock = lock; 
+
+  // if (lock->holder != NULL) 
+  // {
+  //   if (current->priority > lock->holder->priority)
+  //     lock->holder->priority = current->priority;
+
+  //   current->waiting_lock = lock;
+  //   struct thread *next = lock->holder;
+  //   /* Prithvi driving*/
+  //   while (next->waiting_lock != NULL) 
+  //   {
+  //     struct thread *holder = next->waiting_lock->holder;
+  //     if (next->priority > holder->priority) 
+  //     {
+  //       /* in this loop we swap priorities that is chained to the lock */
+  //       holder->priority = next->priority;
+  //       next = holder;
+  //     }
+  //   }

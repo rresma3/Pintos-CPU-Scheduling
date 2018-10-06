@@ -538,7 +538,7 @@ init_thread (struct thread *t, const char *name, int priority)
   t->alarm = 0;
   sema_init (&(t->block), 0);
   
-  t->init_priority = priority;
+  t->initial_priority = priority;
   list_init(&t->list_of_locks); /* list of locks thread is trying to acquire */
   list_init(&t->owned_locks);
   t->donated = 0;

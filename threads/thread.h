@@ -101,9 +101,9 @@ struct thread
     int64_t alarm;                      /* Alarm ticks value */
     struct semaphore block;             /* Semaphore for blocking/unblocking */
     struct list_elem blocked_elem;      /* element in our blocked list */
-    int init_priority;                  /* pre-donation priority */
     
     // needed for priority donations?
+    int initial_priority;               /* pre-donation priority */
     int donated;                        /* set to positive value if thread has donated priority*/
     struct list list_of_locks;          /* list of locks thread is trying to acquire */
     struct list owned_locks;
