@@ -585,7 +585,7 @@ next_thread_to_run (void)
     ////////////////////////////////////////////////////////////////////////////////
     /* sort the ready list based on priority such that the next thread 
         should be the one with the highest priority */
-    list_sort (&ready_list, list_priority_sort, NULL);
+    //ist_sort (&ready_list, list_priority_sort, NULL);
     return list_entry (list_pop_front (&ready_list), struct thread, elem);
   }
 }
