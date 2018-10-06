@@ -213,7 +213,7 @@ lock_acquire (struct lock *lock)
 
 
  
-  /*if (lock->holder != NULL)
+  if (lock->holder != NULL)
   {
     if (lock->holder->priority < thread_current()->priority)
     {
@@ -222,7 +222,7 @@ lock_acquire (struct lock *lock)
         lock->holder->donated = 1;
         thread_donate_priority (lock->holder, thread_current()->priority);
     }
-  }*/
+  }
   
   sema_down (&lock->semaphore);
   lock->holder = thread_current ();
@@ -259,12 +259,12 @@ lock_release (struct lock *lock)
   ASSERT (lock != NULL);
   ASSERT (lock_held_by_current_thread (lock));
   
-  /*if (lock->holder->donated)
+  if (lock->holder->donated)
   {
       printf("Got in here 2\n");
       lock->holder->priority = lock->holder->initial_priority;
       lock->holder->donated = 0;
-  }*/
+  }
   
   lock->holder = NULL;
   sema_up (&lock->semaphore);

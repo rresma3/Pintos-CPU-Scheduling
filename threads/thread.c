@@ -375,8 +375,9 @@ thread_set_priority (int new_priority)
   {
     t->priority = new_priority;
   }
+  
   // it has a donation: the initial priority only should have changed
-  //t->initial_priority = new_priority;
+  t->initial_priority = new_priority;
 
   // if current thread gets its priority decreased, then yield
   // (foremost entry in ready_list shall have the highest priority)
