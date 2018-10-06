@@ -271,9 +271,15 @@ lock_release (struct lock *lock)
   if (lock->holder->donated > 0)
   {
       if (!list_empty (&(thread_current ()->priority_donors)))
+      {
         lock->holder->priority = list_entry (list_pop_front (&(thread_current ()->priority_donors)), struct thread, donor_elem)->priority;
+        printf("We popped a priority of %d\n", lock->holder->priority);
+      } 
       else
+      {
         lock->holder->priority = lock->holder->initial_priority;
+        printf("We restored initial priority of %d\n", lock->holder->priority);
+      }
       
       lock->holder->donated--;
   }
