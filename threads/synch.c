@@ -69,7 +69,7 @@ sema_down (struct semaphore *sema)
   while (sema->value == 0) 
     {
       //list_push_back (&sema->waiters, &thread_current ()->elem);
-      list_insert_ordered(&sema->waiters, &thread_current ()->elem, list_priority_sort, NULL);
+      list_insert_ordered(&sema->waiters, &thread_current ()->elem, list_priority_sort_sema, NULL);
       thread_block ();
     }
   sema->value--;
@@ -336,7 +336,7 @@ cond_wait (struct condition *cond, struct lock *lock)
   waiter.priority = thread_get_priority ();
   sema_init (&waiter.semaphore, 0);
   //list_push_back (&cond->waiters, &waiter.elem);
-  list_insert_ordered(&cond->waiters, &waiter.elem, list_priority_sort, NULL);
+  list_insert_ordered(&cond->waiters, &waiter.elem, list_priority_sort_monitor, NULL);
   lock_release (lock);
   sema_down (&waiter.semaphore);
   lock_acquire (lock);
@@ -380,7 +380,19 @@ cond_broadcast (struct condition *cond, struct lock *lock)
 
 
 static bool
-list_priority_sort(const struct list_elem *a, const struct list_elem *b, void *aux)
+list_priority_sort_sema(const struct list_elem *a, const struct list_elem *b, void *aux)
+{
+  struct thread *temp_thread_1 = list_entry(a, struct thread, elem);
+  struct thread *temp_thread_2 = list_entry(b, struct thread, elem);
+
+  if (temp_thread_1->priority <= temp_thread_2->priority)
+    return false;
+  return true;
+}
+
+
+static bool
+list_priority_sort_monitor(const struct list_elem *a, const struct list_elem *b, void *aux)
 {
   struct semaphore_elem *temp_sema_1 = list_entry(a, struct semaphore_elem, elem);
   struct semaphore_elem *temp_sema_2 = list_entry(b, struct semaphore_elem, elem);
