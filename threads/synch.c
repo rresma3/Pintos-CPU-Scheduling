@@ -217,6 +217,7 @@ lock_acquire (struct lock *lock)
   {
     if (lock->holder->priority < thread_current()->priority)
     {
+        printf("Got in here\n");
         //donate priority
         lock->holder->donated = 1;
         thread_donate_priority (lock->holder, thread_current()->priority);
