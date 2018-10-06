@@ -543,6 +543,7 @@ init_thread (struct thread *t, const char *name, int priority)
   t->initial_priority = priority;
   list_init(&t->list_of_locks); /* list of locks thread is trying to acquire */
   //list_init(&t->owned_locks);
+  list_init(&t->priority_donors);
   t->donated = 0;
   t->magic = THREAD_MAGIC;
 
