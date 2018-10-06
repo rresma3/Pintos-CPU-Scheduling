@@ -68,7 +68,8 @@ sema_down (struct semaphore *sema)
   old_level = intr_disable ();
   while (sema->value == 0) 
     {
-      list_push_back (&sema->waiters, &thread_current ()->elem);
+      //list_push_back (&sema->waiters, &thread_current ()->elem);
+      list_insert_ordered(&sema->waiters, &thread_current ()->elem, list_priority_sort, NULL);
       thread_block ();
     }
   sema->value--;
@@ -113,6 +114,8 @@ sema_up (struct semaphore *sema)
   thread_yield ();
 }
 
+
+//enables us to increment a semaphore without yielding
 void
 sema_Up (struct semaphore *sema)
 {
@@ -329,7 +332,8 @@ cond_wait (struct condition *cond, struct lock *lock)
   ASSERT (lock_held_by_current_thread (lock));
   
   sema_init (&waiter.semaphore, 0);
-  list_push_back (&cond->waiters, &waiter.elem);
+  //list_push_back (&cond->waiters, &waiter.elem);
+  list_insert_ordered(&cond->waiters, &waiter.elem, list_priority_sort, NULL);
   lock_release (lock);
   sema_down (&waiter.semaphore);
   lock_acquire (lock);
@@ -369,4 +373,16 @@ cond_broadcast (struct condition *cond, struct lock *lock)
 
   while (!list_empty (&cond->waiters))
     cond_signal (cond, lock);
+}
+
+
+static bool
+list_priority_sort(const struct list_elem *a, const struct list_elem *b, void *aux)
+{
+  struct thread *temp_thread_1 = list_entry(a, struct thread, elem);
+  struct thread *temp_thread_2 = list_entry(b, struct thread, elem);
+
+  if (temp_thread_1->priority <= temp_thread_2->priority)
+    return false;
+  return true;
 }

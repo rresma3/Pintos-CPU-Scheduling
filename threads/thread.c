@@ -253,22 +253,13 @@ thread_unblock (struct thread *t)
   ASSERT (t->status == THREAD_BLOCKED);
   ////////////////////////////////////////////////////////////////////////////////
   // list_push_back (&ready_list, &t->elem);
-  list_insert_ordered(&ready_list, &t->elem, list_priority_sort, NULL);
+  list_insert_ordered (&ready_list, &t->elem, list_priority_sort, NULL);
   t->status = THREAD_READY;
   intr_set_level (old_level);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-static bool
-list_priority_sort(const struct list_elem *a, const struct list_elem *b, void *aux)
-{
-  struct thread *temp_thread_1 = list_entry(a, struct thread, elem);
-  struct thread *temp_thread_2 = list_entry(b, struct thread, elem);
 
-  if (temp_thread_1->priority <= temp_thread_2->priority)
-    return false;
-  return true;
-}
 
 /* Returns the name of the running thread. */
 const char *
@@ -341,7 +332,7 @@ thread_yield (void)
   {
     ////////////////////////////////////////////////////////////////////////////////
     //list_push_back (&ready_list, &cur->elem);
-    list_insert_ordered(&ready_list, &cur->elem, list_priority_sort, NULL);
+    list_insert_ordered (&ready_list, &cur->elem, list_priority_sort, NULL);
   }  
   cur->status = THREAD_READY;
   schedule ();
@@ -411,7 +402,7 @@ thread_donate_priority(struct thread *t, int new_priority)
     struct thread *next = list_entry(list_begin(&ready_list), struct thread, elem);
     if (next != NULL && next->priority > new_priority) 
     {
-      thread_yield();
+      thread_yield ();
     }
   }
 }
