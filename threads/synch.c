@@ -385,7 +385,7 @@ list_priority_sort(const struct list_elem *a, const struct list_elem *b, void *a
   struct semaphore_elem *temp_sema_1 = list_entry(a, struct semaphore_elem, elem);
   struct semaphore_elem *temp_sema_2 = list_entry(b, struct semaphore_elem, elem);
 
-  if (temp_sema_1.priority <= temp_sema_2.priority)
+  if (temp_sema_1->priority <= temp_sema_2->priority)
     return false;
   return true;
 }
