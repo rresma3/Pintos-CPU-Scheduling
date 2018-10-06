@@ -206,11 +206,12 @@ thread_create (const char *name, int priority,
 
   //intr_set_level (old_level);
 
-  /* Add to run queue. */
+  /* Add to ready queue. */
   
   thread_unblock (t);
   
-  ////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
+  /* Ryan is driving */
   // check if newly added thread is higher priority than current running thread
   thread_yield ();
   
@@ -251,20 +252,23 @@ thread_unblock (struct thread *t)
 
   old_level = intr_disable ();
   ASSERT (t->status == THREAD_BLOCKED);
-  ////////////////////////////////////////////////////////////////////////////////
-  // list_push_back (&ready_list, &t->elem);
+  /////////////////////////////////////////////////////////////////////////////
+  /* Matthew is driving */
   list_insert_ordered (&ready_list, &t->elem, list_priority_sort, NULL);
   t->status = THREAD_READY;
   intr_set_level (old_level);
 }
 
-////////////////////////////////////////////////////////////////////////////////
+/* Jack is driving */
 static bool
-list_priority_sort(const struct list_elem *a, const struct list_elem *b, void *aux)
+list_priority_sort(const struct list_elem *a, const struct list_elem *b, 
+        void *aux)
 {
+  //get threads from given elements
   struct thread *temp_thread_1 = list_entry(a, struct thread, elem);
   struct thread *temp_thread_2 = list_entry(b, struct thread, elem);
-
+  
+  //returns false if given thread's priority is <= that of one on the list
   if (temp_thread_1->priority <= temp_thread_2->priority)
     return false;
   return true;
@@ -338,11 +342,12 @@ thread_yield (void)
 
   old_level = intr_disable ();
   if (cur != idle_thread) 
-  {
-    ////////////////////////////////////////////////////////////////////////////////
-    //list_push_back (&ready_list, &cur->elem);
-    list_insert_ordered (&ready_list, &cur->elem, list_priority_sort, NULL);
-  }  
+    {
+      /////////////////////////////////////////////////////////////////////////
+      // list_push_back (&ready_list, &cur->elem);
+      // keep threads ordered by priority when yielding.
+      list_insert_ordered (&ready_list, &cur->elem, list_priority_sort, NULL);
+    }  
   cur->status = THREAD_READY;
   schedule ();
   intr_set_level (old_level);
@@ -358,7 +363,7 @@ thread_foreach (thread_action_func *func, void *aux)
   ASSERT (intr_get_level () == INTR_OFF);
 
   for (e = list_begin (&all_list); e != list_end (&all_list);
-       e = list_next (e))
+          e = list_next (e))
     {
       struct thread *t = list_entry (e, struct thread, allelem);
       func (t, aux);
@@ -366,15 +371,16 @@ thread_foreach (thread_action_func *func, void *aux)
 }
 
 /* Sets the current thread's priority to NEW_PRIORITY. */
+/* Ryan is driving */
 void
 thread_set_priority (int new_priority) 
 {
-  // if the current thread has no donation, then it is normal priority change request.
+  // if the current thread has no donation, then normal priority change request
   struct thread *t = thread_current();
   if (t->priority == t->initial_priority) 
-  {
-    t->priority = new_priority;
-  }
+    {
+      t->priority = new_priority;
+    }
   
   // it has a donation: the initial priority only should have changed
   t->initial_priority = new_priority;
@@ -382,13 +388,14 @@ thread_set_priority (int new_priority)
   // if current thread gets its priority decreased, then yield
   // (foremost entry in ready_list shall have the highest priority)
   if (!list_empty (&ready_list)) 
-  {
-    struct thread *next = list_entry(list_begin(&ready_list), struct thread, elem);
-    if (next != NULL && next->priority > new_priority) 
     {
-      thread_yield();
+      struct thread *next = list_entry(list_begin(&ready_list), struct thread,
+              elem);
+      if (next != NULL && next->priority > new_priority) 
+        {
+          thread_yield();
+        }
     }
-  }
 }
 
 /* Returns the current thread's priority. */
@@ -399,23 +406,28 @@ thread_get_priority (void)
 }
 
 ///////////////////////////////////////////////////////////////////////////
+/* Ryan is driving */
 void 
 thread_donate_priority(struct thread *t, int new_priority)
 {
    // donation : change only current priority
   t->priority = new_priority;
+  /* Jack is driving */
+  // current thread is donating its priority to thread t so,
+  // add thread t to current thread's priority_donors list
   list_push_front(&(thread_current ()->priority_donors), &(t->donor_elem));
   
   // if current thread gets its priority decreased, then yield
   // (foremost entry in ready_list shall have the highest priority)
   if (t == thread_current() && !list_empty (&ready_list)) 
-  {
-    struct thread *next = list_entry(list_begin(&ready_list), struct thread, elem);
-    if (next != NULL && next->priority > new_priority) 
     {
-      thread_yield ();
+      struct thread *next = list_entry(list_begin(&ready_list), struct thread,
+              elem);
+      if (next != NULL && next->priority > new_priority) 
+        {
+          thread_yield ();
+        }
     }
-  }
 }
 
 /* Sets the current thread's nice value to NICE. */
@@ -537,21 +549,23 @@ init_thread (struct thread *t, const char *name, int priority)
   t->priority = priority;
 
   // initialize our declared thread struct vars
+  /* Ryan is driving */
   t->alarm = 0;
   sema_init (&(t->block), 0);
   
-  t->initial_priority = priority;
-  list_init(&t->list_of_locks);       /* list of locks thread is trying to acquire */
-  list_init(&t->priority_donors);
+  t->initial_priority = priority;     /* set initial_priority value */
+  list_init(&t->waiting_locks);       /* list of locks thread is waiting on */
+  list_init(&t->priority_donors);     /* initialize priority_donors list */
   t->donated = 0;
   t->magic = THREAD_MAGIC;
 
 
 
   old_level = intr_disable();
-  ////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
   // list_push_back (&all_list, &t->allelem);
-  // insert the newly init. thread into list based on priority
+  // insert the newly init. thread into list based on priority, 
+  // highest priorities at the front
   list_insert_ordered (&all_list, &(t->allelem), list_priority_sort, NULL);
   intr_set_level(old_level);
 }
@@ -580,13 +594,14 @@ next_thread_to_run (void)
   if (list_empty (&ready_list))
     return idle_thread;
   else 
-  {
-    ////////////////////////////////////////////////////////////////////////////////
-    /* sort the ready list based on priority such that the next thread 
-        should be the one with the highest priority */
-    //ist_sort (&ready_list, list_priority_sort, NULL);
-    return list_entry (list_pop_front (&ready_list), struct thread, elem);
-  }
+    {
+      /////////////////////////////////////////////////////////////////////////
+      /* sort the ready list based on priority such that the next thread 
+          should be the one with the highest priority */
+      /* Ryan is driving */
+      // ist_sort (&ready_list, list_priority_sort, NULL);
+      return list_entry (list_pop_front (&ready_list), struct thread, elem);
+    }
 }
 
 /* Completes a thread switch by activating the new thread's page

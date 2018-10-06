@@ -31,7 +31,8 @@ static void busy_wait (int64_t loops);
 static void real_time_sleep (int64_t num, int32_t denom);
 static void real_time_delay (int64_t num, int32_t denom);
 
-static bool list_sort_func(const struct list_elem *a, const struct list_elem *b, void *aux);
+static bool list_sort_func(const struct list_elem *a, 
+        const struct list_elem *b, void *aux);
 
 
 // List of processes in BLOCKED state
@@ -94,26 +95,32 @@ timer_elapsed (int64_t then)
 
 /* Sleeps for approximately TICKS timer ticks.  Interrupts must
    be turned on. */
+/* Ryan is driving */
 void
 timer_sleep (int64_t duration) 
 {
   // check if ticks is even a viable value
   if (duration > 0)
-  {
-    // momentarily disable interrupts while we add thread to blocked list
-    enum intr_level old_level = intr_disable();
-    // save the current thread
-    struct thread *curr_thread = thread_current ();
-    // set an alarm for the current thread to wake up
-    curr_thread->alarm = timer_ticks () + duration;  
-    // insert the alarm into the blocked list in alarm-sorted order
-    list_insert_ordered (&blocked_list, &(curr_thread->blocked_elem), list_sort_func, NULL);
-    // block the current thread using its built in semaphore
-    sema_down (&(curr_thread->block));
-    // enable interrupts once thread has been blocked
-    intr_set_level (old_level);
-    
-  }
+    {
+      // momentarily disable interrupts while we add thread to blocked list
+      enum intr_level old_level = intr_disable ();
+      
+      // save the current thread
+      struct thread *curr_thread = thread_current ();
+      
+      // set an alarm for the current thread to wake up
+      curr_thread->alarm = timer_ticks () + duration;  
+      
+      // insert the alarm into the blocked list in alarm-sorted order
+      list_insert_ordered (&blocked_list, &(curr_thread->blocked_elem), 
+              list_sort_func, NULL);
+      
+      // block the current thread using its built in semaphore
+      sema_down (&(curr_thread->block));
+      
+      // enable interrupts once thread has been blocked
+      intr_set_level (old_level);
+    }
 }
 
 /* Sleeps for approximately MS milliseconds.  Interrupts must be
@@ -185,8 +192,10 @@ timer_print_stats (void)
 {
   printf ("Timer: %"PRId64" ticks\n", timer_ticks ());
 }
-
+
+
 /* Timer interrupt handler. */
+/* Everyone drove and changed things in this function */
 static void
 timer_interrupt (struct intr_frame *args UNUSED)
 {  
@@ -196,27 +205,30 @@ timer_interrupt (struct intr_frame *args UNUSED)
   enum intr_level old_level = intr_disable();
   // first check if there is a thread currently in the blocked list
   if (!list_empty(&blocked_list))
-  {
-    // save the current thread to be the front of the blocked list
-    struct thread *curr_thread = list_entry (list_begin (&blocked_list), struct thread, blocked_elem);
-    // check if our current thread's alarm actually went off
-    while (ticks >= curr_thread->alarm)
     {
-      // because the blocked list is alarm-sorted, simply remove the front
-      list_pop_front (&blocked_list);
+      // save the current thread to be the front of the blocked list
+      struct thread *curr_thread = list_entry (list_begin (&blocked_list), 
+              struct thread, blocked_elem);
       
-      // unblock the current thread after removing from blocked list
-      sema_Up (&(curr_thread->block));
-      
-      if (!list_empty(&blocked_list))  // are there still blocked threads?
-      {
-        // if so, check the next thread in line
-        curr_thread = list_entry (list_begin (&blocked_list), struct thread, blocked_elem);
-      }
-      else
-        break;
+      // check if our current thread's alarm actually went off
+      while (ticks >= curr_thread->alarm)
+        {
+          // because the blocked list is alarm-sorted, simply remove the front
+          list_pop_front (&blocked_list);
+          
+          // unblock the current thread after removing from blocked list
+          sema_Up (&(curr_thread->block));
+          
+          if (!list_empty (&blocked_list))  // are there still blocked threads?
+            {
+              // if so, check the next thread in line
+              curr_thread = list_entry (list_begin (&blocked_list), 
+                      struct thread, blocked_elem);
+            }
+          else
+            break;
+        }
     }
-  }
   // enable interrupts once again after unblocking thread
   intr_set_level (old_level);
 }
@@ -293,16 +305,19 @@ real_time_delay (int64_t num, int32_t denom)
 }
 
 /* Our implemented list_sort_func */
+/* Jack is driving */
 static bool
 list_sort_func(const struct list_elem *a, const struct list_elem *b, void *aux)
 {
-  struct thread *temp_thread_1 = list_entry(a, struct thread, blocked_elem);
-  struct thread *temp_thread_2 = list_entry(b, struct thread, blocked_elem);
+  // get threads from provided elements
+  struct thread *temp_thread_1 = list_entry (a, struct thread, blocked_elem);
+  struct thread *temp_thread_2 = list_entry (b, struct thread, blocked_elem);
 
+  /* Ryan is driving */
   if (temp_thread_1->alarm < temp_thread_2->alarm)
-    return true;
+    return true;  // return true if given alarm is less than one on the list
   else if (temp_thread_1->alarm > temp_thread_2->alarm)
-    return false;
-  else
+    return false; // return false if given alarm is greater than one on list
+  else // return if alarms are equal, true if given thread's priority is higher
     return (temp_thread_1->priority > temp_thread_2->priority);
 }

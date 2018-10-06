@@ -87,27 +87,31 @@ typedef int tid_t;
 struct thread
   {
     /* Owned by thread.c. */
-    tid_t tid;                          /* Thread identifier. */
-    enum thread_status status;          /* Thread state. */
-    char name[16];                      /* Name (for debugging purposes). */
-    uint8_t *stack;                     /* Saved stack pointer. */
-    int priority;                       /* Priority. */
-    struct list_elem allelem;           /* List element for all threads list. */
+    tid_t tid;                      /* Thread identifier. */
+    enum thread_status status;      /* Thread state. */
+    char name[16];                  /* Name (for debugging purposes). */
+    uint8_t *stack;                 /* Saved stack pointer. */
+    int priority;                   /* Priority. */
+    struct list_elem allelem;       /* List element for all threads list. */
 
     /* Shared between thread.c and synch.c. */
-    struct list_elem elem;              /* List element. */
+    struct list_elem elem;          /* List element. */
 
     /* Our inserted struct elemtnts */
-    int64_t alarm;                      /* Alarm ticks value */
-    struct semaphore block;             /* Semaphore for blocking/unblocking */
-    struct list_elem blocked_elem;      /* element in our blocked list */
+    /* Jack is driving */
+    int64_t alarm;                  /* Alarm ticks value */
+    struct semaphore block;         /* Semaphore for blocking/unblocking */
+    struct list_elem blocked_elem;  /* element in our blocked list */
     
     // needed for priority donations?
-    int initial_priority;               /* pre-donation priority */
-    int donated;                        /* set to positive value if thread has donated priority*/
-    struct list list_of_locks;          /* list of locks thread is trying to acquire */
-    struct list priority_donors;
-    struct list_elem donor_elem;
+    /* Matthew is driving */
+    int initial_priority;           /* pre-donation priority */
+    int donated;                    /* positive if has donated priority */
+    struct list waiting_locks;      /* list of locks thread is trying to get */
+    struct list priority_donors;    /* List of thread who donated priority */
+    
+    struct list_elem donor_elem;    
+        /* Elem to add thread to priority_donors list */
 
 
 #ifdef USERPROG
@@ -134,7 +138,11 @@ typedef void thread_func (void *aux);
 tid_t thread_create (const char *name, int priority, thread_func *, void *);
 
 void thread_block (void);
-static bool list_priority_sort(const struct list_elem *a, const struct list_elem *b, void *aux);
+
+// function to sort thread based on priority for adding them to lists
+static bool list_priority_sort (const struct list_elem *a,
+        const struct list_elem *b, void *aux);
+
 void thread_unblock (struct thread *);
 /* Our priority compare method to compare two threads based on priority */
 
@@ -152,8 +160,9 @@ void thread_foreach (thread_action_func *, void *);
 
 int thread_get_priority (void);
 void thread_set_priority (int);
+
 /* Our implemented donate priority func */
-void thread_donate_priority(struct thread *t, int priority);
+void thread_donate_priority (struct thread *t, int priority);
 
 int thread_get_nice (void);
 void thread_set_nice (int);
