@@ -211,6 +211,7 @@ lock_acquire (struct lock *lock)
   struct thread *current = thread_current ();
   int current_thread_priority = thread_current()->priority;
 
+
   // struct lock *current_lock = lock; 
 
   // if (lock->holder != NULL) 
@@ -220,7 +221,7 @@ lock_acquire (struct lock *lock)
 
   //   current->waiting_lock = lock;
   //   struct thread *next = lock->holder;
-  //   /* Prithvi driving */
+  //   /* Prithvi driving*/
   //   while (next->waiting_lock != NULL) 
   //   {
   //     struct thread *holder = next->waiting_lock->holder;
@@ -232,7 +233,11 @@ lock_acquire (struct lock *lock)
   //     }
   //   }
 
-
+  if ()
+  {
+      
+  }
+  
   sema_down (&lock->semaphore);
   lock->holder = thread_current ();
 }

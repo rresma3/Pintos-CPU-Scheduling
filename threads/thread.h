@@ -102,14 +102,13 @@ struct thread
     struct semaphore block;             /* Semaphore for blocking/unblocking */
     struct list_elem blocked_elem;      /* element in our blocked list */
     int init_priority;                  /* pre-donation priority */
+    
     // needed for priority donations?
     int donated;                        /* set to positive value if thread has donated priority*/
     struct list list_of_locks;          /* list of locks thread is trying to acquire */
     struct list owned_locks;
     struct lock *holded_lock;           
     struct lock *tta_lock;              //trying to acquire this lock
-
-
 
 
 #ifdef USERPROG
