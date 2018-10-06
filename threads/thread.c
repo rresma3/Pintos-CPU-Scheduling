@@ -371,12 +371,12 @@ thread_set_priority (int new_priority)
 {
   // if the current thread has no donation, then it is normal priority change request.
   struct thread *t = thread_current();
-  if (t->priority == t->init_priority) 
+  if (t->priority == t->initial_priority) 
   {
     t->priority = new_priority;
   }
   // it has a donation: the initial priority only should have changed
-  t->init_priority = new_priority;
+  t->initial_priority = new_priority;
 
   // if current thread gets its priority decreased, then yield
   // (foremost entry in ready_list shall have the highest priority)
