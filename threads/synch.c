@@ -325,12 +325,14 @@ void
 cond_wait (struct condition *cond, struct lock *lock) 
 {
   struct semaphore_elem waiter;
-  printf("The thread's priority is %d\n", list_entry(&waiter.elem, struct semaphore_elem, elem)->priority);
+  //printf("The thread's priority is %d\n", list_entry(&waiter.elem, struct thread, elem)->priority);
 
   ASSERT (cond != NULL);
   ASSERT (lock != NULL);
   ASSERT (!intr_context ());
   ASSERT (lock_held_by_current_thread (lock));
+  
+  printf("Thread priority is %d\n", thread_get_priority ());
   
   sema_init (&waiter.semaphore, 0);
   list_push_back (&cond->waiters, &waiter.elem);
