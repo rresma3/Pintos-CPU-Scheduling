@@ -404,7 +404,8 @@ thread_donate_priority(struct thread *t, int new_priority)
 {
    // donation : change only current priority
   t->priority = new_priority;
-
+  list_push_front(thread_current ()->priority_donors, t);
+  
   // if current thread gets its priority decreased, then yield
   // (foremost entry in ready_list shall have the highest priority)
   if (t == thread_current() && !list_empty (&ready_list)) 
